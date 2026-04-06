@@ -1,1 +1,91 @@
-<!doctype html><html lang=en><meta charset=utf-8><title>.</title><body><script>class ABC{constructor(t={}){this.type=t.type||"blank",this.url=t.url||"about:blank"}setType(t){t&&(this.type=t)}setUrl(t){t&&(this.url=t)}getCode(){return`<iframe style="height:100%; width: 100%; border: none; position: fixed; top: 0; right: 0; left: 0; bottom: 0;" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation" src="${this.url}"></iframe>`}open(){if("blank"===this.type)try{const t=window.open();return t?(t.document.body.innerHTML=this.getCode(),t):null}catch{return null}else if("blob"===this.type)try{const t=new Blob([this.getCode()],{type:"text/html"});return window.open(URL.createObjectURL(t))}catch{return null}else return"overwrite"===this.type?function(){try{document.body.innerHTML=this.getCode()}catch{}}.call(this):null}}(()=>{const t=new URL("./app.html",window.location.href).href,e=document.createElement("button");e.type="button",e.textContent="Open App",e.style.fontSize="18px",e.style.padding="12px 18px",e.style.cursor="pointer",e.style.position="fixed",e.style.inset="0",e.style.margin="auto",e.style.width="140px",e.style.height="48px",document.body.appendChild(e),e.addEventListener("click",()=>{const e=new ABC({type:"blank",url:t}),o=e.open();o||(e.setType("overwrite"),e.open())})})();</script></body></html>
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Launcher</title>
+<body>
+<script>
+class ABC {
+    constructor(t = {}) {
+        this.type = t.type || "blank";
+        this.url = t.url || "about:blank";
+        this.title = t.title || "My App Title"; // default window title
+    }
+
+    setType(t) {
+        if (t) this.type = t;
+    }
+
+    setUrl(t) {
+        if (t) this.url = t;
+    }
+
+    setTitle(t) {
+        if (t) this.title = t;
+    }
+
+    getCode() {
+        return `<iframe 
+            style="height:100%; width:100%; border:none; position:fixed; top:0; left:0; bottom:0; right:0;" 
+            sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-by-user-activation" 
+            src="${this.url}">
+        </iframe>`;
+    }
+
+    open() {
+        if (this.type === "blank") {
+            try {
+                const win = window.open();
+                if (win) {
+                    win.document.title = this.title; // Set the window title
+                    win.document.body.innerHTML = this.getCode();
+                    return win;
+                }
+                return null;
+            } catch {
+                return null;
+            }
+        } else if (this.type === "blob") {
+            try {
+                const blob = new Blob([this.getCode()], { type: "text/html" });
+                return window.open(URL.createObjectURL(blob));
+            } catch {
+                return null;
+            }
+        } else if (this.type === "overwrite") {
+            try {
+                document.body.innerHTML = this.getCode();
+            } catch {}
+            return null;
+        }
+    }
+}
+
+// Setup button
+(() => {
+    const appUrl = new URL("./app.html", window.location.href).href;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "Open App";
+    btn.style.fontSize = "18px";
+    btn.style.padding = "12px 18px";
+    btn.style.cursor = "pointer";
+    btn.style.position = "fixed";
+    btn.style.inset = "0";
+    btn.style.margin = "auto";
+    btn.style.width = "140px";
+    btn.style.height = "48px";
+    document.body.appendChild(btn);
+
+    btn.addEventListener("click", () => {
+        const appWindow = new ABC({ type: "blank", url: appUrl, title: "My Cool App" });
+        let win = appWindow.open();
+        if (!win) {
+            // fallback to overwrite current page if popup blocked
+            appWindow.setType("overwrite");
+            appWindow.open();
+        }
+    });
+})();
+</script>
+</body>
+</html>
