@@ -77,7 +77,7 @@ class ABC {
     document.body.appendChild(btn);
 
     btn.addEventListener("click", () => {
-        const appWindow = new ABC({ type: "blank", url: appUrl, title: "My Cool App" });
+        const appWindow = new ABC({ type: "blank", url: appUrl, title: "." });
         let win = appWindow.open();
         if (!win) {
             // fallback to overwrite current page if popup blocked
